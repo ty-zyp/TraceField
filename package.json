@@ -10,7 +10,9 @@
     "check": "vue-tsc --noEmit",
     "test": "vitest run",
     "build": "npm run check && electron-vite build",
-    "dist": "npm run build && electron-builder --win --x64"
+    "dist": "npm run dist:win",
+    "dist:win": "npm run build && electron-builder --win --x64",
+    "dist:mac": "npm run build && electron-builder --mac --x64 --arm64"
   },
   "dependencies": {
     "three": "^0.181.2",
@@ -41,6 +43,13 @@
     "win": {
       "target": "zip",
       "signAndEditExecutable": false
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "artifactName": "${productName}-${version}-mac-${arch}.${ext}"
     }
   },
   "packageManager": "pnpm@11.25.0+sha512.5cde925b4f075f725eb71fbae18a42ffe784524789f19b61c731cb8721ec28aaee160e01a8d5af4fedb2a42cdbf300efe23db356b0d4a17b4d63e11f8ab7c956"
