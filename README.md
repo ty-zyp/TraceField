@@ -24,12 +24,32 @@ pnpm dev
 
 首次启动会自动准备 Electron 运行时，然后打开开发窗口。Vue、CSS 和渲染端代码保存后会热更新或刷新页面，主进程代码改动后会自动重启 Electron。终端按 `Ctrl+C` 可停止开发环境。
 
-运行测试或生成 Windows 发布包时，分别使用以下命令。
+运行测试、生成 Windows x64 ZIP 或生成 macOS x64/arm64 的 DMG 和 ZIP 时，分别使用以下命令。
 
 ```powershell
 pnpm test
 pnpm dist
+pnpm dist:mac
 ```
+
+版本 `0.1.2` 的 macOS 产物如下：
+
+```text
+release/TraceField-0.1.2-mac-arm64.dmg
+release/TraceField-0.1.2-mac-arm64.zip
+release/TraceField-0.1.2-mac-x64.dmg
+release/TraceField-0.1.2-mac-x64.zip
+```
+
+如需使用 Developer ID Application 证书签名，可在运行 macOS 打包命令前设置以下环境变量：
+
+```bash
+export CSC_LINK='/path/to/DeveloperIDApplication.p12'
+export CSC_KEY_PASSWORD='certificate-password'
+pnpm dist:mac
+```
+
+不得将证书、密码或其他秘密提交到版本库。此配置不会执行 Apple 公证；未签名或未经公证的安装包在其他 Mac 上可能被 Gatekeeper 阻止。
 
 发布文件在 `release`。以下命令额外运行 LDS 样本测试，并在打包程序上验证播放、导入和记录性能。将路径替换为本机 LDS 仓库的样本目录。
 
