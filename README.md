@@ -1,6 +1,6 @@
 # TraceField
 
-离线 Windows 查看器，支持 LDS 激光路径、三维网格和点云。解压 Windows x64 ZIP 后，运行其中的 `TraceField.exe`。打开或拖入 G-code、NC、TAP、NGC、GLB、OBJ、PLY 或 PCD 文件。
+离线桌面查看器，支持 Windows 和 macOS，可查看 LDS 激光路径、三维网格和点云。Windows 用户解压 Windows x64 ZIP 后，运行其中的 `TraceField.exe`；macOS 用户可打开 DMG 并将 TraceField 拖入 Applications，或解压 ZIP 后打开 `TraceField.app`。打开或拖入 G-code、NC、TAP、NGC、GLB、OBJ、PLY 或 PCD 文件。
 
 G-code 默认使用 XY 顶视，可切换到三维视角。进度条按累计路径长度定位，包含快移和关光移动。1× 将完整路径播放约 15 秒。XYZ 以毫米显示，初始程序位置设为 (0, 0, 0)。遇到超出首版支持范围的指令时，查看器显示出错行以及之前已解析的路径。
 
