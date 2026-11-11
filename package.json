@@ -1,0 +1,47 @@
+{
+  "name": "lds-path-viewer",
+  "productName": "TraceField",
+  "version": "0.1.2",
+  "private": true,
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "install-electron && electron-vite dev --watch",
+    "start": "install-electron && electron-vite preview",
+    "check": "vue-tsc --noEmit",
+    "test": "vitest run",
+    "build": "npm run check && electron-vite build",
+    "dist": "npm run build && electron-builder --win --x64"
+  },
+  "dependencies": {
+    "three": "^0.181.2",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/three": "^0.181.0",
+    "@vitejs/plugin-vue": "^5.2.0",
+    "electron": "^42.0.0",
+    "electron-builder": "^26.0.0",
+    "electron-vite": "^5.0.0",
+    "typescript": "~5.9.2",
+    "vite": "^6.0.0",
+    "vitest": "^3.2.0",
+    "vue-tsc": "^3.0.0"
+  },
+  "build": {
+    "appId": "local.lds.pathviewer",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*",
+      "package.json",
+      "!node_modules/**/*"
+    ],
+    "win": {
+      "target": "zip",
+      "signAndEditExecutable": false
+    }
+  },
+  "packageManager": "pnpm@11.25.0+sha512.5cde925b4f075f725eb71fbae18a42ffe784524789f19b61c731cb8721ec28aaee160e01a8d5af4fedb2a42cdbf300efe23db356b0d4a17b4d63e11f8ab7c956"
+}
