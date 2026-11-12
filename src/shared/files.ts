@@ -1,8 +1,12 @@
 export const gcodeExtensions = ['gcode', 'nc', 'tap', 'ngc']
 export const fileExtensions = [...gcodeExtensions, 'glb', 'obj', 'ply', 'pcd']
-export const maxFileBytes = 128 * 1024 * 1024
+export const maxFileBytes = 512 * 1024 * 1024
 export const maxGcodeBytes = 1024 * 1024 * 1024
 export const fileExtension = (name: string) => name.split('.').pop()?.toLowerCase() ?? ''
+export const fileSizeLimit = (extension: string) =>
+  gcodeExtensions.includes(extension) ? maxGcodeBytes : maxFileBytes
+export const isFileSizeAllowed = (extension: string, size: number) =>
+  size > 0 && size <= fileSizeLimit(extension)
 
 export interface DiskFile {
   name: string
