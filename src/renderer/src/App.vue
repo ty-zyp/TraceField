@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import traceFieldLogo from '../../../tracefield-logo.png'
-import { fileExtension, fileExtensions, gcodeExtensions, maxFileBytes, maxGcodeBytes, readFileBytes, type DiskFile } from '../../shared/files'
+import {
+  fileExtension,
+  fileExtensions,
+  gcodeExtensions,
+  isFileSizeAllowed,
+  readFileBytes,
+  type DiskFile,
+} from '../../shared/files'
 import { maxDetailLines, readSourcePage, type GcodeLineRange, type GcodeSourceIndex } from '../../shared/gcodeFile'
 import { distanceAtLine, engraving, locate, pulse, type PathData, type XYZ } from '../../shared/gcode'
 import GcodeWorker from './gcode.worker?worker&inline'
@@ -385,8 +392,8 @@ function resetView() {
 async function open(file: File | DiskFile, asPoints = false, remember = false) {
   const extension = fileExtension(file.name)
   const isGcode = gcodeExtensions.includes(extension)
-  if (!fileExtensions.includes(extension) || !file.size || file.size > (isGcode ? maxGcodeBytes : maxFileBytes)) {
-    error.value = '请选择受支持的非空文件。G-code 上限为 1 GiB，三维模型上限为 128 MiB。'
+  if (!fileExtensions.includes(extension) || !isFileSizeAllowed(extension, file.size)) {
+    error.value = '请选择受支持的非空文件。G-code 上限为 1 GiB，三维模型上限为 512 MiB。'
     return
   }
   if (remember && file instanceof File) currentFile.value = file
@@ -571,8 +578,8 @@ async function openReference(event: Event) {
   input.value = ''
   if (!file || !path.value || !viewport) return
   const extension = fileExtension(file.name)
-  if (!referenceExtensions.includes(extension) || !file.size || file.size > maxFileBytes) {
-    referenceError.value = '请选择 128 MiB 以内的 PLY、PCD 或 GLB 文件。'
+  if (!referenceExtensions.includes(extension) || !isFileSizeAllowed(extension, file.size)) {
+    referenceError.value = '请选择 512 MiB 以内的 PLY、PCD 或 GLB 文件。'
     return
   }
   referenceJob?.abort()

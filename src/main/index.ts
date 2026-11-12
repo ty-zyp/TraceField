@@ -2,9 +2,13 @@ import { app, BrowserWindow, dialog, ipcMain, protocol } from 'electron'
 import { randomUUID } from 'node:crypto'
 import { mkdirSync } from 'node:fs'
 import { open, readFile, stat } from 'node:fs/promises'
-import { basename, extname, join } from 'node:path'
+import { basename, join } from 'node:path'
 import { Readable } from 'node:stream'
-import { fileExtensions, gcodeExtensions, maxFileBytes, maxGcodeBytes } from '../shared/files'
+import {
+  fileExtensions,
+  fileExtension,
+  isFileSizeAllowed,
+} from '../shared/files'
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'viewer-file', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true } },
@@ -14,11 +18,11 @@ const reloadFiles = new Map<number, { token: string; path: string; size: number;
 
 ipcMain.handle('viewer:reload', async (event, path: string) => {
   if (event.senderFrame !== event.sender.mainFrame || !BrowserWindow.fromWebContents(event.sender)) return null
-  const extension = extname(path).slice(1).toLowerCase()
+  const extension = fileExtension(path)
   if (!fileExtensions.includes(extension)) return null
   const info = await stat(path).catch(() => null)
   if (!info?.isFile()) throw new Error('无法读取原文件，请确认文件仍在原位置。')
-  if (!info.size || info.size > (gcodeExtensions.includes(extension) ? maxGcodeBytes : maxFileBytes)) {
+  if (!isFileSizeAllowed(extension, info.size)) {
     throw new Error('原文件为空或超过预览大小上限。')
   }
   const id = event.sender.id
@@ -66,10 +70,12 @@ ipcMain.handle('viewer:open', async (event) => {
   if (canceled) return null
 
   const path = filePaths[0]
-  const extension = extname(path).slice(1).toLowerCase()
+  const extension = fileExtension(path)
   if (!fileExtensions.includes(extension)) throw new Error('不支持此文件格式。')
   const info = await stat(path)
-  if (!info.isFile() || info.size > maxFileBytes) throw new Error('请选择 128 MiB 以内的文件。')
+  if (!info.isFile() || !isFileSizeAllowed(extension, info.size)) {
+    throw new Error('请选择受支持的非空文件。G-code 上限为 1 GiB，三维模型上限为 512 MiB。')
+  }
   const bytes = await readFile(path)
   return { name: basename(path), bytes: Uint8Array.from(bytes).buffer }
 })
