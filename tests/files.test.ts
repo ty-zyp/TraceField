@@ -10,10 +10,14 @@ describe('file size limits', () => {
   it('uses 512 MiB for 3D models and 1 GiB for G-code', () => {
     expect(maxFileBytes).toBe(512 * 1024 * 1024)
     expect(maxGcodeBytes).toBe(1024 * 1024 * 1024)
-    expect(fileSizeLimit('glb')).toBe(maxFileBytes)
-    expect(fileSizeLimit('pcd')).toBe(maxFileBytes)
-    expect(fileSizeLimit('gcode')).toBe(maxGcodeBytes)
-    expect(fileSizeLimit('nc')).toBe(maxGcodeBytes)
+  })
+
+  it.each(['glb', 'obj', 'ply', 'pcd'])('uses the model limit for .%s files', (extension) => {
+    expect(fileSizeLimit(extension)).toBe(maxFileBytes)
+  })
+
+  it.each(['gcode', 'nc', 'tap', 'ngc'])('uses the G-code limit for .%s files', (extension) => {
+    expect(fileSizeLimit(extension)).toBe(maxGcodeBytes)
   })
 
   it('accepts the exact limit and rejects empty or oversized files', () => {

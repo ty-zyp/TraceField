@@ -1,7 +1,26 @@
-import { expect, it } from 'vitest'
-import { maxGcodeBytes } from '../src/shared/files'
+import { expect, it, vi } from 'vitest'
+import { maxFileBytes, maxGcodeBytes } from '../src/shared/files'
 import { engraving } from '../src/shared/gcode'
 import { loadGcodeFile, readSourcePage } from '../src/shared/gcodeFile'
+
+it('uses overview mode above 128 MiB even when below the model file limit', async () => {
+  const file = {
+    name: 'large.gcode',
+    size: 128 * 1024 * 1024 + 1,
+    url: 'file://large.gcode',
+  }
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+    ok: true,
+    arrayBuffer: async () => new ArrayBuffer(0),
+  }))
+  try {
+    const result = await loadGcodeFile(file, { lineCount: 1, offsets: [0], pointMode: false })
+    expect(file.size).toBeLessThan(maxFileBytes)
+    expect(result.overview).toBe(true)
+  } finally {
+    vi.unstubAllGlobals()
+  }
+})
 
 it('indexes mixed line endings and restores state for a range after a chunk boundary', async () => {
   const prefix = 'G91\rM4S80\nG1X2\r\n'

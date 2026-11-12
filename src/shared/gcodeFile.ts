@@ -1,8 +1,9 @@
-import { maxFileBytes, readFileBytes, type DiskFile } from './files'
+import { readFileBytes, type DiskFile } from './files'
 import { maxSegments, parseGcodeLines, pointCommand, type PathData } from './gcode'
 
 const chunkBytes = 4 * 1024 * 1024
 const maxLineBytes = 1024 * 1024
+export const maxGcodeOverviewBytes = 128 * 1024 * 1024
 export const sourcePageLines = 1024
 
 export interface GcodeSourceIndex {
@@ -91,7 +92,7 @@ async function readPath(file: Blob | DiskFile, index: GcodeSourceIndex, overview
 export async function loadGcodeFile(file: Blob | DiskFile, index?: GcodeSourceIndex, range?: GcodeLineRange,
   onProgress?: (processedLines: number) => void) {
   const sourceIndex = index ?? await indexSource(file)
-  let overview = !range && (file.size > maxFileBytes || sourceIndex.lineCount > maxSegments)
+  let overview = !range && (file.size > maxGcodeOverviewBytes || sourceIndex.lineCount > maxSegments)
   let path = await readPath(file, sourceIndex, overview, range, onProgress)
   if (!range && path.limitReached) {
     overview = true
